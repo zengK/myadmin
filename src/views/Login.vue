@@ -19,6 +19,7 @@
 
 <script>
   import { requestLogin } from '../api/api';
+  import { apisms } from '../api/index'
   //import NProgress from 'nprogress'
   export default {
     data() {
@@ -83,7 +84,16 @@
         });
       },
       getCode(){
+        apisms({mobile: this.ruleForm.tel}).then((res)=>{
+          if(res.code==200){
+            this.$message({
+              type:'success',
+              message: '发送成功'
+            })
+          }
+        })
         this.isdisable = true
+        
         this.sendCode()
       },
       sendCode() {
