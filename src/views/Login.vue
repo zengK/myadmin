@@ -96,7 +96,7 @@ export default {
     },
     getCode() {
       apisms({ mobile: this.ruleForm.mobile }).then(res => {
-        console.log(res)
+        alert(res)
         if (res.code == 200) {
           this.$message({
             type: "success",
@@ -115,6 +115,7 @@ export default {
         this.btnmsg = this.numberCode + "秒";
         if (this.numberCode == 0) {
           clearInterval(timeClock);
+          this.numberCode = 60;
           this.isdisable = false;
           this.btnmsg = "重新发送";
         }
