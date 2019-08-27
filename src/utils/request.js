@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: '/admin/', // api的base_url
+  baseURL: 'http://47.104.162.109/', // api的base_url
   timeout: 120000 // 请求超时时间
 })
 // request拦截器
