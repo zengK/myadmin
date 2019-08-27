@@ -16,3 +16,12 @@ export function login(params) {
     params:Qs.parse(params)
   })
 }
+//	api/bind
+
+export function bind(params) {
+  return request({
+    url: '/api/bind',
+    method: 'get',
+    params:Qs.parse(params)
+  })
+}

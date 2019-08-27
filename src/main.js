@@ -25,21 +25,13 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  //NProgress.start();
-  if (to.path == '/login') {
-    sessionStorage.removeItem('user');
-  }
-  let user = JSON.parse(sessionStorage.getItem('user'));
-  if (!user && to.path != '/login') {
+  let userinfo = JSON.parse(sessionStorage.getItem('userinfo'));
+  if (!userinfo && to.path != '/login') {
     next({ path: '/login' })
   } else {
     next()
   }
 })
-
-//router.afterEach(transition => {
-//NProgress.done();
-//});
 
 new Vue({
   //el: '#app',

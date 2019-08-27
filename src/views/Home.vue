@@ -75,10 +75,10 @@
 	export default {
 		data() {
 			return {
-				sysName:'VUEADMIN',
+				sysName:'管理系统',
 				collapsed:false,
-				sysUserName: '',
-				sysUserAvatar: '',
+				sysUserName: '用户名',
+				sysUserAvatar: '../../static/photo.jpeg',
 				form: {
 					name: '',
 					region: '',

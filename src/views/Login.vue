@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { requestLogin } from "../api/api";
+// import { requestLogin } from "../api/api";
 import { apisms, login } from "../api/index";
 //import NProgress from 'nprogress'
 export default {
@@ -77,12 +77,15 @@ export default {
             console.log(res)
             if (res.code == 200) {
               sessionStorage.setItem("userinfo",JSON.stringify(res.data))
-              if(res.data.isbind == true){
-                this.$router.push({ path: "/main" })
+              if(res.data.isbind){
+                this.$message({
+                  type:'success',
+                  message: res.msg
+                })
+                this.$router.push("/main")
               }else{
-                this.$router.push({ path: "/form" });
+                this.$router.push({ path: "/bind" })
               }
-             
             } else {
               this.$message({
                 message: res.msg,
