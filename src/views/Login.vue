@@ -15,7 +15,7 @@
       </el-form-item>
       <el-form-item prop="smsNumber" label="验证码">
         <el-input
-          type="password"
+          type="text"
           style="width:140px"
           v-model.number="ruleForm.smsNumber"
           auto-complete="off"
@@ -73,19 +73,21 @@ export default {
     handleSubmit2(ev) {
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
-          this.logining = true;
           login({mobile:this.ruleForm.mobile}).then(res => {
-            if (res.code !== 200) {
-              this.$message({
-                message: res.msg,
-                type: "error"
-              });
-            } else {
-              if (info) {
-                this.$router.push({ path: "/main" });
-              } else {
+            console.log(res)
+            if (res.code == 200) {
+              sessionStorage.setItem("userinfo",JSON.stringify(res.data))
+              if(res.data.isbind == true){
+                this.$router.push({ path: "/main" })
+              }else{
                 this.$router.push({ path: "/form" });
               }
+             
+            } else {
+              this.$message({
+                message: res.msg,
+                type: 'error'
+              });
             }
           });
         } else {
@@ -96,12 +98,13 @@ export default {
     },
     getCode() {
       apisms({ mobile: this.ruleForm.mobile }).then(res => {
-        alert(res)
         if (res.code == 200) {
           this.$message({
             type: "success",
             message: "发送成功"
           });
+        } else {
+          this.$message.error(res.msg);
         }
       });
       this.isdisable = true;

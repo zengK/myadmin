@@ -14,10 +14,9 @@ service.interceptors.request.use(config => {
   Promise.reject(error)
 })
 
-// respone拦截器
 service.interceptors.response.use(
   response => {
-    return response
+    return response.data
   },
   error => {
     return Promise.reject(error)
