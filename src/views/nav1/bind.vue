@@ -5,13 +5,14 @@
 	</el-row>
 	<el-col :span="12" v-show="type==1">
 		<h2>免费</h2>
-		<el-form ref="form2" :model="form2" label-width="120px" style="margin:20px;width:60%;min-width:600px;">
-			<el-form-item label="绑定店铺ID">
-				<el-input style="width:300px" v-model="form2.id"></el-input>
+		<el-form ref="form2" 
+			:model="form2"
+			label-width="120px" style="margin:20px;width:60%;min-width:600px;">
+			<el-form-item label="绑定店铺ID" prop="storeid">
+				<el-input style="width:300px" v-model="form2.list[0].storeid"></el-input>
 			</el-form-item>
 			<el-form-item>
 				<el-button type="primary" @click="onSubmit('form2')">立即创建</el-button>
-				<!-- <el-button>取消</el-button> -->
 			</el-form-item>
 		</el-form>
 	</el-col>
@@ -22,9 +23,9 @@
 				<el-button style="width:150px" type="success" @click="addshopId()"> 增加绑定店铺 </el-button>
 			</el-form-item>
 			<el-form-item label="绑定店铺ID：">
-				<el-row style="marginBottom:20px" v-for="(item, index) in form.Ids" :key="index">
+				<el-row style="marginBottom:20px" v-for="(item, index) in form.list" :key="index">
 					<el-col :span="20">
-						<el-input style="width:300px" v-model="item.id" placeholder="请输入店铺id"></el-input>
+						<el-input style="width:300px" v-model="item.storeid" placeholder="请输入店铺id"></el-input>
 					</el-col>
 					<el-col :span="4">
 						<el-button type="danger" @click="removeShopId(index)">删除</el-button>
@@ -32,7 +33,7 @@
 				</el-row>
 			</el-form-item>
 			<el-form-item>
-				<el-button type="primary" @click="onSubmit1">立即创建</el-button>
+				<el-button type="primary" @click="submitPay('form')">立即创建</el-button>
 				<!-- <el-button>取消</el-button> -->
 			</el-form-item>
 		</el-form>
@@ -63,23 +64,26 @@
 </template>
 
 <script>
-	import { bind } from '../../api/index' 
+	import { bind, bindstoreid } from '../../api/index' 
 	export default {
 		data() {
 			return {
 				loading: false,
 				dialogVisible: true,
 				exitFileList: [],
+				ispayShop:'',
 				type:2,
 				mobile:'',
 				form2:{
-					id: '',
-					type: '1'
+					list:[
+						{storeid: ''}
+					],
+					ispayShop: 1
 				},
 				form: {
-					type: '2',
-					Ids:[
-						{id: ''}
+					ispayShop: 2,
+					list:[
+						{storeid: ''}
 					]
 				}
 			}
@@ -91,22 +95,63 @@
 		},
 		methods: {
 			addshopId(){
-				if(this.form.Ids.length == 10){
+				if(this.form.list.length == 10){
 					this.$message.error('最多添加10个店铺ID');
 				} else{
-					this.form.Ids.push( {id: ''} )
+					this.form.list.push( {storeid: ''} )
 				}
 			},
 			removeShopId(index){
-				if(this.form.Ids.length == 1){
+				if(this.form.list.length == 1){
 					this.$message.error('最少保留一个店铺ID');
 				} else{
-					this.form.Ids.splice(index,1)
+					this.form.list.splice(index,1)
 				}
 			},
-			onSubmit() {
-				// alert(this.form2.id)
-				sessionStorage.setItem("form2", this.form2)
+			onSubmit(form2) {
+				this.$refs[form2].validate((valid) => {
+					if (valid) {
+						this.form2.mobile = this.mobile
+						bindstoreid(this.form2).then((res)=>{
+							if(res.code==200){
+								this.$message({
+									type:'success',
+									message:'绑定成功'
+								})
+								this.$router.push({path:"/main"})
+							}else{
+								this.$message({
+									type:'error',
+									message:res.msg
+								})
+							}
+						})
+
+					} else {
+						console.log('error submit!!');
+						return false;
+					}
+
+				});
+
+			},
+			submitPay(form){
+				this.form.mobile = this.mobile
+					bindstoreid(this.form).then((res)=>{
+						if(res.code==200){
+							this.$message({
+								type:'success',
+								message:'绑定成功'
+							})
+							this.$router.push({path:"/main"})
+						}else{
+							this.$message({
+								type:'error',
+								message:res.msg
+							})
+						}
+					})
+
 			},
 			//选择付费类型
 			changetype(type){
@@ -116,6 +161,8 @@
 							type:'success',
 							message: res.msg
 						})
+						this.ispayShop = res.data.ispayShop
+						this.dialogVisible = false
 					}
 				})
 			}

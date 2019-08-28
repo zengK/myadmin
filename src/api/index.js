@@ -25,3 +25,11 @@ export function bind(params) {
     params:Qs.parse(params)
   })
 }
+// api/bindstoreid
+export function bindstoreid(params) {
+  return request({
+    url: '/api/bindstoreid',
+    method: 'post',
+    data: params
+  })
+}
