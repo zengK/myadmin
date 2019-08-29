@@ -64,7 +64,7 @@
 </template>
 
 <script>
-	import { bind, bindstoreid } from '../../api/index' 
+	import { bind, bindstoreid, alipay } from '../../api/index' 
 	export default {
 		data() {
 			return {
@@ -155,16 +155,30 @@
 			},
 			//选择付费类型
 			changetype(type){
-				bind({mobile:this.mobile,bind:type}).then((res)=>{
-					if(res.code==200){
-						this.$message({
-							type:'success',
-							message: res.msg
-						})
-						this.ispayShop = res.data.ispayShop
-						this.dialogVisible = false
-					}
-				})
+				if(type == 2){
+					alipay().then((res)=>{
+						console.log(res)
+						let routerData = this.$router.resolve({path:'/pay',query:{htmls:res}})
+	                 	this.htmls = res
+	                 	//打开新页面
+	                 	window.open(routerData.href)
+	//                   	const div = document.createElement('div');
+	//                   	div.innerHTML = htmls;
+	//                  	document.body.appendChild(div)
+	//                  	document.forms [0].submit()
+					})
+				} else{
+					bind({mobile:this.mobile,bind:type}).then((res)=>{
+						if(res.code==200){
+							this.$message({
+								type:'success',
+								message: res.msg
+							})
+							this.ispayShop = false
+							this.dialogVisible = false
+						}
+					})
+				}
 			}
 		}
 	}

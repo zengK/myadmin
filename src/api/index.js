@@ -33,3 +33,12 @@ export function bindstoreid(params) {
     data: params
   })
 }
+//获取支付接口
+// api/alipay
+export function alipay(params) {
+  return request({
+    url: '/api/alipay',
+    method: 'get',
+    data: params
+  })
+}
