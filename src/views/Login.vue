@@ -17,7 +17,7 @@
         <el-input
           type="text"
           style="width:140px"
-          v-model.number="ruleForm.smsNumber"
+          v-model="ruleForm.smsNumber"
           auto-complete="off"
           placeholder="验证码"
         ></el-input>
@@ -60,7 +60,7 @@ export default {
           {type:'number',required:true,message: '请输入正确的手机号', trigger: 'blur'}
         ],
         smsNumber:[
-          {type:'number',required:true,message: '请输入验证码', trigger: 'blur'}
+          {required:true, trigger: 'blur'}
         ]
       },
       checked: true
@@ -106,6 +106,12 @@ export default {
             type: "success",
             message: "发送成功"
           });
+        } else if(res.code == 33) {
+          this.$message({
+            type: "success",
+            message: "发送成功"
+          });
+          // this.$message.error(res.msg);
         } else {
           this.$message.error(res.msg);
         }

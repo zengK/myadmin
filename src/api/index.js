@@ -42,3 +42,12 @@ export function alipay(params) {
     data: params
   })
 }
+//宇:
+// http://47.104.162.109/api/getExcel
+export function getExcel(params) {
+  return request({
+    url: '/api/getExcel',
+    method: 'post',
+    data: params
+  })
+}
