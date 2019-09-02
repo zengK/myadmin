@@ -19,10 +19,16 @@
                 chartLine: null,
                 chartPie: null,
                 params:{
-                    page: 1,
-                    size: 50,
+                    page: 0,
+                    size: 25,
                     mobile: ''
-                }
+                },
+                pages: [],
+                cityS:[],
+                percentage:[],
+                listArr:[],
+                dataList:[],
+                dataList2:[]
             }
         },
         created(){
@@ -32,173 +38,81 @@
         methods: {
             getListData(){
                 inquirecity(this.params).then((res)=>{
-                    console.log(res)
+                    this.listArr = res.data.page.data
+                    for(var i=0; i<this.listArr.length;i++){
+                        this.cityS.push(this.listArr[i].name)
+                        this.percentage.push(this.listArr[i].value)
+                    } 
+                    for(var i=0; i<res.data.page.last_page;i++){
+                        this.pages.push(i+1)
+                    }
+                    this.dataList.push(this.cityS)
+                    console.log(this.dataList)
                 })
-            },
-            
-            drawColumnChart() {
-                this.chartColumn = echarts.init(document.getElementById('chartColumn'));
-                this.chartColumn.setOption({
-                  title: { text: 'Column Chart' },
-                  tooltip: {},
-                  xAxis: {
-                      data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
-                  },
-                  yAxis: {},
-                  series: [{
-                      name: '销量',
-                      type: 'bar',
-                      data: [5, 20, 36, 10, 10, 20]
-                    }]
-                });
             },
             drawBarChart() {
                 this.chartBar = echarts.init(document.getElementById('chartBar'));
-                this.chartBar.setOption({
-                    title: {
-                        text: 'Bar Chart',
-                        subtext: '数据来自网络'
-                    },
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                            type: 'shadow'
-                        }
-                    },
-                    legend: {
-                        data: ['2011年', '2012年']
-                    },
-                    grid: {
-                        left: '3%',
-                        right: '4%',
-                        bottom: '3%',
-                        containLabel: true
-                    },
-                    xAxis: {
-                        type: 'value',
-                        boundaryGap: [0, 0.01]
-                    },
-                    yAxis: {
-                        type: 'category',
-                        data: ['巴西', '印尼', '美国', '印度', '中国', '世界人口(万)']
-                    },
-                    series: [
-                        {
-                            name: '2011年',
-                            type: 'bar',
-                            data: [18203, 23489, 29034, 104970, 131744, 630230]
+                var option = {
+                    timeline:{
+                        data: this.pages,
+                        label : {
+                            formatter : function(s) { return "第"+s+"页"; }
                         },
-                        {
-                            name: '2012年',
-                            type: 'bar',
-                            data: [19325, 23438, 31000, 121594, 134141, 681807]
-                        }
-                    ]
-                });
-            },
-            drawLineChart() {
-                this.chartLine = echarts.init(document.getElementById('chartLine'));
-                this.chartLine.setOption({
-                    title: {
-                        text: 'Line Chart'
-                    },
-                    tooltip: {
-                        trigger: 'axis'
-                    },
-                    legend: {
-                        data: ['邮件营销', '联盟广告', '搜索引擎']
-                    },
-                    grid: {
-                        left: '3%',
-                        right: '4%',
-                        bottom: '3%',
-                        containLabel: true
-                    },
-                    xAxis: {
-                        type: 'category',
-                        boundaryGap: false,
-                        data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-                    },
-                    yAxis: {
-                        type: 'value'
-                    },
-                    series: [
-                        {
-                            name: '邮件营销',
-                            type: 'line',
-                            stack: '总量',
-                            data: [120, 132, 101, 134, 90, 230, 210]
-                        },
-                        {
-                            name: '联盟广告',
-                            type: 'line',
-                            stack: '总量',
-                            data: [220, 182, 191, 234, 290, 330, 310]
-                        },
-                        {
-                            name: '搜索引擎',
-                            type: 'line',
-                            stack: '总量',
-                            data: [820, 932, 901, 934, 1290, 1330, 1320]
-                        }
-                    ]
-                });
-            },
-            drawPieChart() {
-                this.chartPie = echarts.init(document.getElementById('chartPie'));
-                this.chartPie.setOption({
-                    title: {
-                        text: 'Pie Chart',
-                        subtext: '纯属虚构',
-                        x: 'center'
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: "{a} <br/>{b} : {c} ({d}%)"
-                    },
-                    legend: {
-                        orient: 'vertical',
-                        left: 'left',
-                        data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
-                    },
-                    series: [
-                        {
-                            name: '访问来源',
-                            type: 'pie',
-                            radius: '55%',
-                            center: ['50%', '60%'],
-                            data: [
-                                { value: 335, name: '直接访问' },
-                                { value: 310, name: '邮件营销' },
-                                { value: 234, name: '联盟广告' },
-                                { value: 135, name: '视频广告' },
-                                { value: 1548, name: '搜索引擎' }
-                            ],
-                            itemStyle: {
-                                emphasis: {
-                                    shadowBlur: 10,
-                                    shadowOffsetX: 0,
-                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                }
+                        autoPlay : false,
+                        playInterval : 1000,
+                        tooltip:{
+                            formatter : function(s) {
+                                return "第"+s.value+"页"; 
                             }
+                        },
+                    },
+                    options:[
+                        {
+                            title : {
+                                'text':'数据统计'
+                            },
+                            tooltip : {'trigger':'axis'},
+                            legend : {
+                                x:'right',
+                                'data':['GDP']
+                            },
+                            calculable : true,
+                            grid : {'y2':80},
+                            xAxis : [{
+                                'type':'category',
+                                //'axisLabel':{'interval':0},
+                                'data':this.cityS
+                            }],
+                            yAxis : [
+                                {
+                                    'type':'value',
+                                    'name':'百分比',
+                                }
+                            ],
+                            series : [
+                                {
+                                    'name':'百分比','type':'bar',
+                                    'data': this.percentage
+                                }
+                            ]
                         }
                     ]
-                });
-            },
-            drawCharts() {
-                // this.drawColumnChart()
-                this.drawBarChart()
-                this.getListData()
-                // this.drawLineChart()
-                // this.drawPieChart()
-            },
+                };
+                this.chartBar.setOption(option);
+                this.chartBar.on('click',(res)=>{
+                    console.log(res) 
+                    this.params.page = res.data-1
+                    this.getListData()
+                })
+            }
         },
 
         mounted: function () {
-            this.drawCharts()
-        },
-        updated: function () {
-            this.drawCharts()
+            this.getListData()
+            setTimeout((res)=>{
+                this.drawBarChart()
+            },2000)
+            
         }
     }
 </script>

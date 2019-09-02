@@ -55,7 +55,7 @@ export function getExcel(params) {
 export function inquirecity(params) {
   return request({
     url: '/api/inquirecity',
-    method: 'post',
-    data: params
+    method: 'get',
+    params: params
   })
 }
