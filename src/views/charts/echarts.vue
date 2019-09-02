@@ -46,8 +46,7 @@
                     for(var i=0; i<res.data.page.last_page;i++){
                         this.pages.push(i+1)
                     }
-                    this.dataList.push(this.cityS)
-                    console.log(this.dataList)
+                    this.drawBarChart()
                 })
             },
             drawBarChart() {
@@ -100,7 +99,6 @@
                 };
                 this.chartBar.setOption(option);
                 this.chartBar.on('click',(res)=>{
-                    console.log(res) 
                     this.params.page = res.data-1
                     this.getListData()
                 })
@@ -110,7 +108,7 @@
         mounted: function () {
             this.getListData()
             setTimeout((res)=>{
-                this.drawBarChart()
+                
             },2000)
             
         }
