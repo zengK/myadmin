@@ -75,6 +75,13 @@ export default {
 				this.fileList = []
 
 				this.$router.push({path:'/table'})
+			} else {
+				this.$message({
+					type:"error",
+					message:res.msg
+				})
+				this.fileList = []
+
 			}
 		},
 		async handleChange() {  

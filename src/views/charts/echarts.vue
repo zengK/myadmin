@@ -1,20 +1,8 @@
 <template>
     <section class="chart-container">
         <el-row>
-            <el-col :span="12">
-                <div id="chartColumn" style="width:100%; height:400px;"></div>
-            </el-col>
-            <el-col :span="12">
-                <div id="chartBar" style="width:100%; height:400px;"></div>
-            </el-col>
-            <el-col :span="12">
-                <div id="chartLine" style="width:100%; height:400px;"></div>
-            </el-col>
-            <el-col :span="12">
-                <div id="chartPie" style="width:100%; height:400px;"></div>
-            </el-col>
             <el-col :span="24">
-                <a href="http://echarts.baidu.com/examples.html" target="_blank" style="float: right;">more>></a>
+                <div id="chartBar" style="width:100%; height:400px;"></div>
             </el-col>
         </el-row>
     </section>
@@ -22,18 +10,32 @@
 
 <script>
     import echarts from 'echarts'
-
+    import { inquirecity } from '../../api/index'
     export default {
         data() {
             return {
                 chartColumn: null,
                 chartBar: null,
                 chartLine: null,
-                chartPie: null
+                chartPie: null,
+                params:{
+                    page: 1,
+                    size: 50,
+                    mobile: ''
+                }
             }
         },
-
+        created(){
+            let userInfo = JSON.parse(sessionStorage.getItem('userinfo'))
+			this.params.mobile = userInfo.mobile 
+        },
         methods: {
+            getListData(){
+                inquirecity(this.params).then((res)=>{
+                    console.log(res)
+                })
+            },
+            
             drawColumnChart() {
                 this.chartColumn = echarts.init(document.getElementById('chartColumn'));
                 this.chartColumn.setOption({
@@ -184,10 +186,11 @@
                 });
             },
             drawCharts() {
-                this.drawColumnChart()
+                // this.drawColumnChart()
                 this.drawBarChart()
-                this.drawLineChart()
-                this.drawPieChart()
+                this.getListData()
+                // this.drawLineChart()
+                // this.drawPieChart()
             },
         },
 

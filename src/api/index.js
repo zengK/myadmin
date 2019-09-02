@@ -5,7 +5,7 @@ export function apisms(params) {
   return request({
     url: '/api/sms',
     method: 'get',
-    params: Qs.parse(params)
+    params: params
   })
 }
 
@@ -47,6 +47,14 @@ export function alipay(params) {
 export function getExcel(params) {
   return request({
     url: '/api/getExcel',
+    method: 'post',
+    data: params
+  })
+}
+// api/inquirecity
+export function inquirecity(params) {
+  return request({
+    url: '/api/inquirecity',
     method: 'post',
     data: params
   })
