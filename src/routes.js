@@ -9,7 +9,10 @@ import Page4 from './views/nav2/Page4.vue'
 import upload from './views/nav2/upload.vue'
 import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
+import echartSku from './views/charts/sku.vue'
 import pay from './views/nav1/pay.vue'
+import tooBuy from './views/charts/tooBuy.vue'
+
 
 let routes = [
     {
@@ -62,10 +65,12 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '数据统计',
+        name: '数据分析',
         iconCls: 'fa fa-bar-chart',
         children: [
-            { path: '/echarts', component: echarts, name: 'echarts' }
+            { path: '/echarts', component: echarts, name: '地域占比' },
+            { path: '/sku', component: echartSku, name: 'sku销售占比' },
+            { path: '/tooBuy', component: tooBuy, name: '回购分析' }
         ]
     },
     {

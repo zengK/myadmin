@@ -2,7 +2,7 @@
     <section class="chart-container">
         <el-row>
             <el-col :span="24">
-                <div id="chartBar" style="width:100%; height:400px;"></div>
+                <div id="chartBar" style="width:100%;"></div>
             </el-col>
         </el-row>
     </section>
@@ -19,8 +19,6 @@
                 chartLine: null,
                 chartPie: null,
                 params:{
-                    page: 0,
-                    size: 25,
                     mobile: ''
                 },
                 pages: [],
@@ -38,70 +36,75 @@
         methods: {
             getListData(){
                 inquirecity(this.params).then((res)=>{
-                    this.listArr = res.data.page.data
+                    this.listArr = res.data
                     for(var i=0; i<this.listArr.length;i++){
-                        this.cityS.push(this.listArr[i].name)
-                        this.percentage.push(this.listArr[i].value)
+                        this.cityS.unshift(this.listArr[i].name)
+                        this.percentage.unshift(this.listArr[i].value)
                     } 
-                    for(var i=0; i<res.data.page.last_page;i++){
-                        this.pages.push(i+1)
-                    }
                     this.drawBarChart()
                 })
             },
             drawBarChart() {
                 this.chartBar = echarts.init(document.getElementById('chartBar'));
                 var option = {
-                    timeline:{
-                        data: this.pages,
-                        label : {
-                            formatter : function(s) { return "第"+s+"页"; }
-                        },
-                        autoPlay : false,
-                        playInterval : 1000,
-                        tooltip:{
-                            formatter : function(s) {
-                                return "第"+s.value+"页"; 
-                            }
-                        },
+                    color: ["#00B7EE"],
+                    title: {
+                        text: '数据统计',
                     },
-                    options:[
-                        {
-                            title : {
-                                'text':'数据统计'
-                            },
-                            tooltip : {'trigger':'axis'},
-                            legend : {
-                                x:'right',
-                                'data':['GDP']
-                            },
-                            calculable : true,
-                            grid : {'y2':80},
-                            xAxis : [{
-                                'type':'category',
-                                //'axisLabel':{'interval':0},
-                                'data':this.cityS
-                            }],
-                            yAxis : [
-                                {
-                                    'type':'value',
-                                    'name':'百分比',
-                                }
-                            ],
-                            series : [
-                                {
-                                    'name':'百分比','type':'bar',
-                                    'data': this.percentage
-                                }
-                            ]
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
                         }
+                    },
+                    legend: {
+                        data: ['城市百分比']
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'value',
+                        show: true,
+                        splitLine:{
+                            show: true
+                        },
+                        axisLabel:{
+                            show: false
+                        },
+                        axisLine:{
+                            show: false
+                        }
+                    },
+                    yAxis: {
+                        type: 'category',
+                        data: this.cityS,
+                        axisLabel:{
+                            interval:0,
+                        }
+                    },
+                    series: [
+                        {
+                            name: '销量',
+                            type: 'bar',
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'insideRight'
+                                }
+                            },
+                            data: this.percentage
+                        }
+                        
                     ]
                 };
                 this.chartBar.setOption(option);
-                this.chartBar.on('click',(res)=>{
-                    this.params.page = res.data-1
-                    this.getListData()
-                })
+                this.autoHeight = this.cityS.length * 30 + 30; // counst.length为柱状图的条数，即数据长度。
+　　            this.chartBar.getDom().style.height = this.autoHeight + "px";
+                this.chartBar.resize();
             }
         },
 
@@ -124,8 +127,10 @@
         height: 400px;
         float: left;
     }*/
-
     .el-col {
         padding: 30px 20px;
+    }
+    #chartBar{
+        height: auto;
     }
 </style>

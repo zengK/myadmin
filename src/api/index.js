@@ -59,3 +59,11 @@ export function inquirecity(params) {
     params: params
   })
 }
+//api/inquiresku
+export function inquiresku(params) {
+  return request({
+    url: '/api/inquiresku',
+    method: 'get',
+    params: params
+  })
+}
