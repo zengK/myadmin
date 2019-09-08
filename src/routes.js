@@ -13,6 +13,7 @@ import echartSku from './views/charts/sku.vue'
 import pay from './views/nav1/pay.vue'
 import tooBuy from './views/charts/tooBuy.vue'
 import maplist from './views/charts/maplist.vue'
+import payMoney from './views/charts/payMoney.vue'
 
 
 
@@ -73,8 +74,8 @@ let routes = [
             { path: '/echarts', component: echarts, name: '地域占比' },
             { path: '/sku', component: echartSku, name: 'sku销售占比' },
             { path: '/tooBuy', component: tooBuy, name: '回购分析' },
-            { path: '/maplist', component: maplist, name: '地域占比2' }
-            
+            { path: '/maplist', component: maplist, name: '地域占比2' },
+            { path: '/payMoney', component: payMoney, name: '消费能力分析' }
         ]
     },
     {

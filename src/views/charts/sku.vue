@@ -1,6 +1,22 @@
 <template>
     <section class="chart-container">
         <el-row>
+            <el-row class="title">
+                <el-col :span="12">sku销售占比</el-col>
+                <el-col :span="12" class="queryDate">
+                    <el-date-picker
+                        v-model="dateTime"
+                        type="datetimerange"
+                        :picker-options="pickerOptions"
+                        format="yyyy/M/d HH:mm"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        align="right">
+                    </el-date-picker>
+                    <el-button type="primary" @click="queryData()">查询</el-button>
+                </el-col>
+            </el-row>
             <el-col :span="24">
                 <div id="chartBar" style="width:100%; height:600px"></div>
             </el-col>
@@ -14,12 +30,39 @@
     export default {
         data() {
             return {
-                chartColumn: null,
                 chartBar: null,
-                chartLine: null,
-                chartPie: null,
+                dateTime: '',
                 params:{
-                    mobile: ''
+                    mobile: '',
+                    startTime: '',
+                    endTime:''
+                },
+                 pickerOptions: {
+                    shortcuts: [{
+                        text: '最近一周',
+                        onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近一个月',
+                        onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                        picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近三个月',
+                        onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                        picker.$emit('pick', [start, end]);
+                        }
+                    }]
                 },
                 pages: [],
                 listArr:[],
@@ -27,7 +70,12 @@
         },
         created(){
             let userInfo = JSON.parse(sessionStorage.getItem('userinfo'))
-			this.params.mobile = userInfo.mobile 
+            this.params.mobile = userInfo.mobile
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 200);
+            this.params.startTime = this.$moment(start).format('YYYY/M/D HH:mm')
+            this.params.endTime = this.$moment(end).format('YYYY/M/D HH:mm')
         },
         methods: {
             getListData(){
@@ -36,13 +84,14 @@
                     this.drawBarChart()
                 })
             },
+            queryData(){
+                this.params.startTime = this.$moment(this.dateTime[0]).format('YYYY/M/D HH:mm')
+                this.params.endTime = this.$moment(this.dateTime[1]).format('YYYY/M/D HH:mm')
+                this.getListData()
+            },
             drawBarChart() {
                 this.chartBar = echarts.init(document.getElementById('chartBar'));
                 var option = {
-                    title : {
-                        text: 'sku销售占比',
-                        x:'center'
-                    },
                     tooltip : {
                         trigger: 'item',
                         formatter: "{a} <br/>{b} : {c} ({d}%)"
@@ -85,19 +134,24 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
     .chart-container {
         width: 100%;
         float: left;
     }
-    /*.chart div {
-        height: 400px;
-        float: left;
-    }*/
-    .el-col {
-        padding: 30px 20px;
-    }
     #chartBar{
         height: auto;
+    }
+    .title{
+        height: 60px;
+        line-height: 60px;
+        font-size: 20px;
+        padding: 0;
+        font-weight: bold;
+        background: #f2f2f2;
+        padding: 0 30px;
+        .queryDate{
+            text-align: right
+        }
     }
 </style>

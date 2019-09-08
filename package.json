@@ -14,6 +14,7 @@
     "echarts": "^3.8.5",
     "element-ui": "^2.12.0",
     "font-awesome": "^4.7.0",
+    "moment": "^2.24.0",
     "nprogress": "^0.2.0",
     "qs": "^6.8.0",
     "vue": "^2.2.2",

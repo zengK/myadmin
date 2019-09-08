@@ -1,11 +1,46 @@
 <template>
     <section class="chart-container">
         <el-row>
+            <el-row class="title">
+                <el-col :span="12">地域分布</el-col>
+                <el-col :span="12" class="queryDate">
+                    <el-date-picker
+                        v-model="dateTime"
+                        type="datetimerange"
+                        :picker-options="pickerOptions"
+                        format="yyyy/M/d HH:mm"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        align="right">
+                    </el-date-picker>
+                    <el-button type="primary" @click="queryData()">查询</el-button>
+                </el-col>
+            </el-row>
             <el-col :span="8">
                 <div id="chartBar" style="width:100%;height:400px"></div>
             </el-col>
             <el-col :span="16">
-                
+                <el-table
+                    :data="tableData"
+                    height="80vh"
+                    border
+                    style="width: 100%">
+                    <el-table-column
+                    prop="city"
+                    label="城市"
+                    width="180">
+                    </el-table-column>
+                    <el-table-column
+                    prop="num"
+                    label="数量"
+                    width="180">
+                    </el-table-column>
+                    <el-table-column
+                    prop="total"
+                    label="总金额">
+                    </el-table-column>
+                </el-table>
             </el-col>
         </el-row>
     </section>
@@ -17,41 +52,84 @@
     export default {
         data() {
             return {
-                chartColumn: null,
                 chartBar: null,
-                chartLine: null,
-                chartPie: null,
+                dateTime: '',
                 params:{
-                    mobile: ''
+                    mobile: '',
+                    startTime:'',
+                    endTime:''
                 },
+                pickerOptions: {
+                    shortcuts: [{
+                        text: '最近一周',
+                        onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近一个月',
+                        onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                        picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近三个月',
+                        onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                        picker.$emit('pick', [start, end]);
+                        }
+                    }]
+                },
+                provinceList:[],
                 pages: [],
                 cityS:[],
                 percentage:[],
                 listArr:[],
                 dataList:[],
-                dataList2:[]
+                dataList2:[],
+                tableData: []
             }
         },
         created(){
             let userInfo = JSON.parse(sessionStorage.getItem('userinfo'))
-			this.params.mobile = userInfo.mobile 
+            this.params.mobile = userInfo.mobile
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 200);
+            this.params.startTime = this.$moment(start).format('YYYY/M/D HH:mm')
+            this.params.endTime = this.$moment(end).format('YYYY/M/D HH:mm')
         },
         methods: {
-            // getListData(){
-            //     inquirecity(this.params).then((res)=>{
-            //         this.listArr = res.data
-            //         for(var i=0; i<this.listArr.length;i++){
-            //             this.cityS.unshift(this.listArr[i].name)
-            //             this.percentage.unshift(this.listArr[i].value)
-            //         } 
-            //         this.drawBarChart()
-            //     })
-            // },
+            queryData(){
+                this.params.startTime = this.$moment(this.dateTime[0]).format('YYYY/M/D HH:mm')
+                this.params.endTime = this.$moment(this.dateTime[1]).format('YYYY/M/D HH:mm')
+                this.getListData()
+            },
+            getListData(){
+                inquirecity(this.params).then((res)=>{
+                    if(res.code == 200){
+                        this.provinceList = res.data.province
+                        this.tableData = res.data.city
+                        this.$message({
+                            type:'success',
+                            message:res.msg
+                        })
+                    } else{
+                        this.$message.error(res.msg)
+                    }
+                    this.drawBarChart()
+                })
+            },
             drawBarChart() {
                 this.chartBar = echarts.init(document.getElementById('chartBar'));
                 var option = {
                     title: {
-                        text: '订单销量',
                         left: 'center'
                     },
                     tooltip: {
@@ -64,11 +142,10 @@
                         orient: 'vertical',
                         left: 'left',
                     },
-                    
                     visualMap: {
                         show:false,
                         min: 0,
-                        max: 300,
+                        max: 10,
                         left: 'left',
                         top: 'top',
                         text: ['高','低'],           // 文本，默认为数值文本
@@ -100,73 +177,37 @@
                                     show: false //省份名称不显示
                                 }
                             },
-                            data:[
-                                {name: '北京',value: 0 },
-                                {name: '天津',value: 11 },
-                                {name: '上海',value: 23 },
-                                {name: '重庆',value: 300 },
-                                {name: '河北',value: 45 },
-                                {name: '河南',value: 3 },
-                                {name: '云南',value: 0 },
-                                {name: '辽宁',value: 300 },
-                                {name: '黑龙江',value: 300 },
-                                {name: '湖南',value: 300 },
-                                {name: '安徽',value: 0 },
-                                {name: '山东',value: 300 },
-                                {name: '新疆',value: 300 },
-                                {name: '江苏',value: 300 },
-                                {name: '浙江',value: 300 },
-                                {name: '江西',value: 300 },
-                                {name: '湖北',value: 0 },
-                                {name: '广西',value: 300 },
-                                {name: '甘肃',value: 0 },
-                                {name: '山西',value: 300 },
-                                {name: '内蒙古',value: 0 },
-                                {name: '陕西',value: 300 },
-                                {name: '吉林',value: 300 },
-                                {name: '福建',value: 300 },
-                                {name: '贵州',value: 300 },
-                                {name: '广东',value: 0 },
-                                {name: '青海',value: 300 },
-                                {name: '西藏',value: 0 },
-                                {name: '四川',value: 300 },
-                                {name: '宁夏',value: 300 },
-                                {name: '海南',value: 300 },
-                                {name: '台湾',value: 300 },
-                                {name: '香港',value: 300 },
-                                {name: '澳门',value: 300 }
-                            ]
+                            data:this.provinceList
                         }
                     ]
                 };
                 this.chartBar.setOption(option);
-            }
+            },
         },
-
-        mounted: function () {
-            // this.getListData()
-            this.drawBarChart()
-            // setTimeout((res)=>{
-                
-            // },2000)
-            
+        mounted() {
+            this.getListData()
         }
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
     .chart-container {
         width: 100%;
         float: left;
     }
-    /*.chart div {
-        height: 400px;
-        float: left;
-    }*/
-    .el-col {
-        padding: 30px 20px;
-    }
     #chartBar{
         height: auto;
+    }
+    .title{
+        height: 60px;
+        line-height: 60px;
+        font-size: 20px;
+        padding: 0;
+        font-weight: bold;
+        background: #f2f2f2;
+        padding: 0 30px;
+        .queryDate{
+            text-align: right
+        }
     }
 </style>

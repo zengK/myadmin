@@ -10,6 +10,8 @@ import Mock from './mock'
 import echarts from 'echarts'
 import 'echarts/map/js/china'
 Vue.prototype.$echarts = echarts 
+import moment from 'moment'
+Vue.prototype.$moment = moment
 Mock.bootstrap();
 import 'font-awesome/css/font-awesome.min.css'
 
