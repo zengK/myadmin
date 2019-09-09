@@ -14,9 +14,9 @@ import pay from './views/nav1/pay.vue'
 import tooBuy from './views/charts/tooBuy.vue'
 import maplist from './views/charts/maplist.vue'
 import payMoney from './views/charts/payMoney.vue'
-
-
-
+import analysis from './views/charts/analysis.vue'
+import xiaofei from './views/charts/xiaofei.vue'
+import RFM from './views/charts/RFM.vue'
 let routes = [
     {
         path: '/login',
@@ -71,11 +71,14 @@ let routes = [
         name: '数据分析',
         iconCls: 'fa fa-bar-chart',
         children: [
-            { path: '/echarts', component: echarts, name: '地域占比' },
+            // { path: '/echarts', component: echarts, name: '地域占比' },
             { path: '/sku', component: echartSku, name: 'sku销售占比' },
-            { path: '/tooBuy', component: tooBuy, name: '回购分析' },
-            { path: '/maplist', component: maplist, name: '地域占比2' },
-            { path: '/payMoney', component: payMoney, name: '消费能力分析' }
+            // { path: '/tooBuy', component: tooBuy, name: '回购分析' },
+            { path: '/maplist', component: maplist, name: '地域占比' },
+            { path: '/payMoney', component: payMoney, name: '消费能力分析' },
+            { path: '/analysis', component: analysis, name: '回购分析'},
+            { path: '/xiaofei', component: xiaofei, name: '消费频次分析'},
+            { path: '/RFM', component: RFM, name: 'RFM模型分析'}
         ]
     },
     {
