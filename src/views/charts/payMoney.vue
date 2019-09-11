@@ -16,7 +16,7 @@
                         align="right">
                     </el-date-picker>
                     新老客户:
-                    <el-select v-model="value" placeholder="请选择">
+                    <el-select v-model="params.status" placeholder="请选择">
                         <el-option
                             v-for="item in options"
                             :key="item.value"
@@ -24,17 +24,17 @@
                             :value="item.value">
                             </el-option>
                         </el-select>
-                    <el-button type="primary">查询</el-button>
+                    <el-button type="primary" @click="queryData()">查询</el-button>
                 </el-col>
             </el-row>
-            <el-col :span="24">
+            <el-col :span="24"  v-loading="loading">
                 <el-row class="chartsTitle">
                     支付金额分布图
                 </el-row>
                 <el-row class="radioS">
                     <el-col :span="2" class="labeltitle">客户指标</el-col>
                     <el-col :span="12">
-                         <el-radio-group v-model="radio">
+                         <el-radio-group v-model="radio" @change="changeType(radio)">
                             <el-radio :label="1">客户数</el-radio>
                             <el-radio :label="2">支付总额</el-radio>
                             <el-radio :label="3">客户支付件数</el-radio>
@@ -49,18 +49,24 @@
 
 <script>
     import echarts from 'echarts'
-    import { inquirecity } from '../../api/index'
+    import { consumptionlevel, inquirecity } from '../../api/index'
     export default {
         data() {
             return {
                 chartBar: null,
+                loading: true,
                 dateTime: '',
                 radio:1,
                 params:{
                     mobile: '',
                     startTime:'',
-                    endTime:''
+                    endTime:'',
+                    status:'all'
                 },
+                newList: [],
+                oldList:[],
+                newAll:[],
+                oldALL:[],
                 pickerOptions: {
                     shortcuts: [{
                         text: '最近一周',
@@ -89,54 +95,72 @@
                     }]
                 },
                 ylable:[
-                    '1-10',
-                    '10-15',
-                    '15-25',
-                    '25-40',
-                    '40-70',
-                    '70-100',
-                    '100-150',
-                    '150-200',
-                    '200-300',
-                    '300-500',
-                    '500-700',
-                    '700-1000',
-                    '1000-1500',
-                    '1500-2000',
-                    '2000-3000',
-                    '3000-4000',
-                    '4000-5000',
-                    '5000-6000',
-                    '6000以上',
-
+                    '1-10','10-15','15-25','25-40','40-70','70-100','100-150','150-200','200-300', '300-500',
+                    '500-700','700-1000','1000-1500','1500-2000','2000-3000','3000-4000','4000-5000','5000-6000','6000以上'
                 ],
                 options: [{
-                    value: '选项1',
-                    label: '黄金糕'
+                    value: 'all',
+                    label: '全部'
                     }, {
-                    value: '选项2',
-                    label: '双皮奶'
+                    value: 'new',
+                    label: '新用户'
                     }, {
-                    value: '选项3',
-                    label: '蚵仔煎'
-                    }, {
-                    value: '选项4',
-                    label: '龙须面'
-                    }, {
-                    value: '选项5',
-                    label: '北京烤鸭'
+                    value: 'old',
+                    label: '老用户'
                 }],
-                value: ''
             }
         },
         created(){
             let userInfo = JSON.parse(sessionStorage.getItem('userinfo'))
             this.params.mobile = userInfo.mobile
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 200);
+            this.params.startTime = this.$moment(start).format('YYYY/M/D HH:mm')
+            this.params.endTime = this.$moment(end).format('YYYY/M/D HH:mm')
+            this.dateTime= [this.params.startTime, this.params.endTime]
         },
         methods: {
             getDate(getDate){
                 this.params.startTime = this.$moment(getDate[0]).format('YYYY/M/D HH:mm')
                 this.params.endTime = this.$moment(getDate[1]).format('YYYY/M/D HH:mm')
+            },
+            getDataList(){
+                consumptionlevel(this.params).then((res)=>{
+                    if(res.code == 200){
+                        this.loading = false
+                        this.newAll = res.data.new
+                        this.oldALL = res.data.old
+                        if(this.radio == 1){
+                            this.newList = res.data.new.clent_num
+                            this.oldList = res.data.old.clent_num
+                        } else if(this.radio == 2) {
+                            this.newList = res.data.new.pay_total
+                            this.oldList = res.data.old.pay_total
+                        } else{
+                            this.newList = res.data.new.pay_num
+                            this.oldList = res.data.old.pay_num
+                        }
+                        this.drawBarChart()
+                    }
+                })
+            },
+            queryData(){
+                this.loading = true
+                this.getDataList()
+            },
+            changeType(radio){
+                if(radio == 1){
+                    this.newList = this.newAll.clent_num
+                    this.oldList = this.oldALL.clent_num
+                } else if(radio == 2) {
+                    this.newList = this.newAll.pay_total
+                    this.oldList = this.oldALL.pay_total
+                } else{
+                    this.newList = this.newAll.pay_num
+                    this.oldList = this.oldALL.pay_num
+                }
+                this.drawBarChart()
             },
             drawBarChart() {
                 this.chartBar = echarts.init(document.getElementById('chartBar'));
@@ -186,7 +210,7 @@
                                     position: 'insideRight'
                                 }
                             },
-                            data: [320, 302, 301, 334, 390, 330, 320]
+                            data: this.newList
                         },
                         {
                             name: '老用户',
@@ -198,7 +222,7 @@
                                     position: 'insideRight'
                                 }
                             },
-                            data: [120, 132, 101, 134, 90, 230, 210]
+                            data: this.oldList
                         }
                     ]
                 }
@@ -206,7 +230,7 @@
             }
         },
         mounted() {
-            this.drawBarChart()
+            this.getDataList()
         }
     }
 </script>

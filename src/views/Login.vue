@@ -60,7 +60,7 @@ export default {
           {type:'number',required:true,message: '请输入正确的手机号', trigger: 'blur'}
         ],
         smsNumber:[
-          {required:true, trigger: 'blur'}
+          {required:true, trigger: 'blur',message: '请输入验证码'}
         ]
       },
       checked: true

@@ -67,3 +67,20 @@ export function inquiresku(params) {
     params: params
   })
 }
+//api/consumptionlevel
+export function consumptionlevel(params) {
+  return request({
+    url: '/api/consumptionlevel',
+    method: 'post',
+    data: params
+  })
+}
+//消费频次分析
+//api/consumptionfrequency
+export function consumpquency(params) {
+  return request({
+    url: '/api/consumptionfrequency',
+    method: 'post',
+    data: params
+  })
+}

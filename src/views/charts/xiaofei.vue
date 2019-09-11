@@ -16,7 +16,7 @@
                         align="right">
                     </el-date-picker>
                     新老客户:
-                    <el-select v-model="value" placeholder="请选择">
+                    <el-select v-model="params.status" placeholder="请选择">
                         <el-option
                             v-for="item in options"
                             :key="item.value"
@@ -24,7 +24,7 @@
                             :value="item.value">
                             </el-option>
                         </el-select>
-                    <el-button type="primary">查询</el-button>
+                    <el-button type="primary" @click="queryData()">查询</el-button>
                 </el-col>
             </el-row>
             <el-row class="detile">
@@ -34,7 +34,7 @@
                 <el-row class="radioS">
                     <el-col :span="1" class="labeltitle">指标选择:</el-col>
                     <el-col :span="6">
-                         <el-radio-group v-model="radio">
+                         <el-radio-group v-model="radio" @change="changeType(radio)">
                             <el-radio :label="1">客户数</el-radio>
                             <el-radio :label="2">支付总额</el-radio>
                             <el-radio :label="3">商品支付件数</el-radio>
@@ -42,7 +42,7 @@
                     </el-col>
                 </el-row>
             </el-row>
-            <el-row>
+            <el-row v-loading="loading">
                 <div id="chartBar" style="width:100%;height:300px"></div>
             </el-row>
             <el-row>
@@ -50,33 +50,33 @@
                     :data="tableData"
                     style="width: 100%">
                     <el-table-column
-                    prop="buyNums"
+                    prop="lable"
                     label="购买次数"
                     width="180">
                     </el-table-column>
                     <el-table-column
-                    prop="clientNumber"
+                    prop="clent_num"
                     label="客户数"
                     width="180">
                     </el-table-column>
                     <el-table-column
-                    prop="client"
+                    prop="clent_num_pct"
                     label="客户占比">
                     </el-table-column>
                     <el-table-column
-                    prop="total"
+                    prop="pay_num"
                     label="商品支付件数">
                     </el-table-column>
                     <el-table-column
-                    prop="money"
+                    prop="pay_avg"
                     label="人均支付件数">
                     </el-table-column>
                     <el-table-column
-                    prop="total"
+                    prop="pay_total"
                     label="支付总额">
                     </el-table-column>
                     <el-table-column
-                    prop="money"
+                    prop="pay_total_pct"
                     label="支付总额占比">
                     </el-table-column>
                 </el-table>
@@ -87,24 +87,25 @@
 
 <script>
     import echarts from 'echarts'
+    import { consumpquency } from '../../api/index'
     export default {
         data() {
             return {
+                loading:true,
                 chartBar: null,
-                dateTime: '',
+                dateTime: [],
                 radio:1,
                 params:{
                     mobile: '',
                     startTime:'',
-                    endTime:''
+                    endTime:'',
+                    status:'all'
                 },
+                radioAllList:[],
                 ylable:[
-                    '购买5次及以上',
-                    '购买4次',
-                    '购买3次',
-                    '购买2次',
-                    '购买1次',
+                    '购买1次','购买2次','购买3次','购买4次','购买5次及以上'
                 ],
+                peopleData:[],
                 pickerOptions: {
                     shortcuts: [{
                         text: '最近一周',
@@ -132,52 +133,16 @@
                         }
                     }]
                 },
-                tableData: [{
-                    buyNums: '购买1次',
-                    clientNumber: 10,
-                    client: '10%',
-                    total: '15%',
-                    money: 2600
-                },{
-                    buyNums: '购买2次',
-                    clientNumber: 10,
-                    client: '10%',
-                    total: '15%',
-                    money: 2600
-                },{
-                    buyNums: '购买3次',
-                    clientNumber: 10,
-                    client: '10%',
-                    total: '15%',
-                    money: 2600
-                },{
-                    buyNums: '购买4次',
-                    clientNumber: 10,
-                    client: '10%',
-                    total: '15%',
-                    money: 2600
-                },{
-                    buyNums: '购买5次及以上',
-                    clientNumber: 10,
-                    client: '10%',
-                    total: '15%',
-                    money: 2600
-                }],
+                tableData: [],
                 options: [{
-                    value: '选项1',
-                    label: '黄金糕'
+                    value: 'all',
+                    label: '全部'
                     }, {
-                    value: '选项2',
-                    label: '双皮奶'
+                    value: 'new',
+                    label: '新用户'
                     }, {
-                    value: '选项3',
-                    label: '蚵仔煎'
-                    }, {
-                    value: '选项4',
-                    label: '龙须面'
-                    }, {
-                    value: '选项5',
-                    label: '北京烤鸭'
+                    value: 'old',
+                    label: '老用户'
                 }],
                 value: ''
             }
@@ -185,13 +150,57 @@
         created(){
             let userInfo = JSON.parse(sessionStorage.getItem('userinfo'))
             this.params.mobile = userInfo.mobile
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 200);
+            this.params.startTime = this.$moment(start).format('YYYY/M/D HH:mm')
+            this.params.endTime = this.$moment(end).format('YYYY/M/D HH:mm')
+            this.dateTime= [this.params.startTime, this.params.endTime]
         },
         methods: {
+            getDataList(){
+                consumpquency(this.params).then((res)=>{
+                    if(res.code == 200){
+                        this.loading = false
+                        if(this.params.status == 'all'){
+                            this.tableData = res.data.all.form
+                            this.radioAllList = res.data.all.histogram
+                        } else{
+                            this.tableData = res.data.newOrold.form
+                            this.radioAllList = res.data.newOrold.histogram
+                        }
+
+                        if(this.radio == 1){
+                            this.peopleData = this.radioAllList.clent_num
+                        } else if(this.radio == 2){
+                            this.peopleData = this.radioAllList.pay_num
+                        } else if(this.radio == 3){
+                            this.peopleData = this.radioAllList.pay_total
+                        }
+                        console.log(res)
+                        this.drawBarChart()
+                    }
+                })
+            },
+            queryData(){
+                this.loading = true
+                this.getDataList()
+            },
             getDate(getDate){
                 this.params.startTime = this.$moment(getDate[0]).format('YYYY/M/D HH:mm')
                 this.params.endTime = this.$moment(getDate[1]).format('YYYY/M/D HH:mm')
             },
-             drawBarChart() {
+            changeType(radio){
+                if(this.radio == 1){
+                    this.peopleData = this.radioAllList.clent_num
+                } else if(this.radio == 2){
+                    this.peopleData = this.radioAllList.pay_num
+                } else if(this.radio == 3){
+                    this.peopleData = this.radioAllList.pay_total
+                }
+                this.drawBarChart()
+            },
+            drawBarChart() {
                 this.chartBar = echarts.init(document.getElementById('chartBar'));
                 var option = {
                     tooltip : {
@@ -230,7 +239,7 @@
                     },
                     series: [
                         {
-                            name: '新用户',
+                            name: '用户',
                             type: 'bar',
                             stack: '总量',
                             label: {
@@ -239,27 +248,28 @@
                                     position: 'insideRight'
                                 }
                             },
-                            data: [320, 302, 301, 334, 390]
-                        },
-                        {
-                            name: '老用户',
-                            type: 'bar',
-                            stack: '总量',
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'insideRight'
-                                }
-                            },
-                            data: [120, 132, 101, 134, 90]
+                            data: this.peopleData
                         }
+                        // ,
+                        // {
+                        //     name: '老用户',
+                        //     type: 'bar',
+                        //     stack: '总量',
+                        //     label: {
+                        //         normal: {
+                        //             show: true,
+                        //             position: 'insideRight'
+                        //         }
+                        //     },
+                        //     data: [120, 132, 101, 134, 90]
+                        // }
                     ]
                 }
                 this.chartBar.setOption(option);
             }
         },
         mounted() {
-            this.drawBarChart()
+            this.getDataList()
         }
     }
 </script>
