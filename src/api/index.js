@@ -84,3 +84,12 @@ export function consumpquency(params) {
     data: params
   })
 }
+//RFM
+//api/inquireRfm
+export function inquireRfm(params) {
+  return request({
+    url: '/api/inquireRfm',
+    method: 'get',
+    params: params
+  })
+}
