@@ -72,16 +72,16 @@
 				dialogVisible: true,
 				exitFileList: [],
 				ispayShop:'',
-				type:2,
+				type:1,
 				mobile:'',
 				form2:{
 					list:[
 						{storeid: ''}
 					],
-					ispayShop: 1
+					ispayShop: 0
 				},
 				form: {
-					ispayShop: 2,
+					ispayShop: 1,
 					list:[
 						{storeid: ''}
 					]
@@ -118,7 +118,7 @@
 									type:'success',
 									message:'绑定成功'
 								})
-								this.$router.push({path:"/main"})
+								this.$router.push({path:"/sku"})
 							}else{
 								this.$message({
 									type:'error',
@@ -162,10 +162,6 @@
 	                 	this.htmls = res
 	                 	//打开新页面
 	                 	window.open(routerData.href)
-	//                   	const div = document.createElement('div');
-	//                   	div.innerHTML = htmls;
-	//                  	document.body.appendChild(div)
-	//                  	document.forms [0].submit()
 					})
 				} else{
 					bind({mobile:this.mobile,bind:type}).then((res)=>{

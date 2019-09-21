@@ -13,11 +13,11 @@
       <el-form-item prop="mobile" label="手机号">
         <el-input type="text" v-model.number="ruleForm.mobile" auto-complete="off" placeholder="手机号"></el-input>
       </el-form-item>
-      <el-form-item prop="smsNumber" label="验证码">
+      <el-form-item prop="code" label="验证码">
         <el-input
           type="text"
           style="width:140px"
-          v-model="ruleForm.smsNumber"
+          v-model.number="ruleForm.code"
           auto-complete="off"
           placeholder="验证码"
         ></el-input>
@@ -51,15 +51,16 @@ export default {
       isdisable: false,
       numberCode: 60,
       btnmsg: "发送验证码",
+
       ruleForm: {
         mobile: "",   
-        smsNumber: ""
+        code: ""
       },
       rules: {
         mobile:[
           {type:'number',required:true,message: '请输入正确的手机号', trigger: 'blur'}
         ],
-        smsNumber:[
+        code:[
           {required:true, trigger: 'blur',message: '请输入验证码'}
         ]
       },
@@ -73,8 +74,7 @@ export default {
     handleSubmit2(ev) {
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
-          login({mobile:this.ruleForm.mobile}).then(res => {
-            console.log(res)
+          login(this.ruleForm).then(res => {
             if (res.code == 200) {
               sessionStorage.setItem("userinfo",JSON.stringify(res.data))
               if(res.data.isbind){
@@ -106,18 +106,16 @@ export default {
             type: "success",
             message: "发送成功"
           });
-        } else if(res.code == 33) {
+        } else if(res.code == 200) {
           this.$message({
             type: "success",
             message: "发送成功"
           });
-          // this.$message.error(res.msg);
         } else {
           this.$message.error(res.msg);
         }
       });
       this.isdisable = true;
-
       this.sendCode();
     },
     sendCode() {

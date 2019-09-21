@@ -173,6 +173,7 @@
             }
         },
         created(){
+            let userInfo = JSON.parse(sessionStorage.getItem('userinfo'))
             this.params.mobile = userInfo.mobile
         },
         methods: {

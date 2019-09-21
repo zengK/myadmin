@@ -30,21 +30,20 @@ let routes = [
         name: '',
         hidden: true
     },
-    //{ path: '/main', component: Main },
-    {
-        path: '/',
-        component: Home,
-        name: '菜单',
-        iconCls: 'el-icon-menu',//图标样式class
-        children: [
-            { path: '/main', component: Main, name: '主页', hidden: false },
-            { path: '/table', component: Table, name: 'Table' },
-            { path: '/bind', component: bind, name: 'bind', hidden:true },
-            { path: '/user', component: user, name: '列表' },
-            { path: '/pay', component: pay, name: 'pay', hidden:true },
+    // {
+    //     path: '/',
+    //     component: Home,
+    //     name: '菜单',
+    //     iconCls: 'el-icon-menu',//图标样式class
+    //     children: [
+    //         { path: '/main', component: Main, name: '主页', hidden: false },
+    //         { path: '/table', component: Table, name: 'Table' },
+    //         { path: '/bind', component: bind, name: 'bind', hidden:true },
+    //         { path: '/user', component: user, name: '列表' },
+    //         { path: '/pay', component: pay, name: 'pay', hidden:true },
             
-        ]
-    },
+    //     ]
+    // },
     {
         path: '/',
         component: Home,
@@ -71,6 +70,8 @@ let routes = [
         name: '数据分析',
         iconCls: 'fa fa-bar-chart',
         children: [
+            { path: '/bind', component: bind, name: 'bind', hidden:true },
+            { path: '/pay', component: pay, name: 'pay', hidden:true },
             // { path: '/echarts', component: echarts, name: '地域占比' },
             { path: '/sku', component: echartSku, name: 'sku销售占比' },
             // { path: '/tooBuy', component: tooBuy, name: '回购分析' },
