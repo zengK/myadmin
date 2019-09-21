@@ -93,3 +93,12 @@ export function inquireRfm(params) {
     params: params
   })
 }
+//回购接口
+//api/inquireBuyBack
+export function inquireBuyBack(params) {
+  return request({
+    url: '/api/inquireBuyBack',
+    method: 'get',
+    params: params
+  })
+}
