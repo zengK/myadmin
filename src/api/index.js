@@ -39,7 +39,16 @@ export function alipay(params) {
   return request({
     url: '/api/alipay',
     method: 'get',
-    data: params
+    params: params
+  })
+}
+//查询是否支付成功
+// /api/return
+export function apiReturn(params) {
+  return request({
+    url: '/api/return',
+    method: 'get',
+    params: params
   })
 }
 //宇:
@@ -98,6 +107,23 @@ export function inquireRfm(params) {
 export function inquireBuyBack(params) {
   return request({
     url: '/api/inquireBuyBack',
+    method: 'get',
+    params: params
+  })
+}
+//exportInquireBuyBack
+export function exportInquireBuyBack(params) {
+  return request({
+    url: '/api/exportInquireBuyBack',
+    method: 'get',
+    params: params
+  })
+}
+//导出付费
+//payForexportInquireBuyBack
+export function payForexportInquireBuyBack(params) {
+  return request({
+    url: '/api/payForexportInquireBuyBack',
     method: 'get',
     params: params
   })

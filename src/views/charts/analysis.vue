@@ -8,7 +8,7 @@
                         v-model="dateTime"
                         type="datetimerange"
                         :picker-options="pickerOptions"
-                        format="yyyy/M/d HH:mm"
+                        format="yyyy-MM-dd HH:mm"
                         @change="getDate(dateTime)"
                         range-separator="至"
                         start-placeholder="开始日期"
@@ -45,6 +45,9 @@
                             <el-radio :label="1">支付金额（M）</el-radio>
                             <el-radio :label="2">购买频次（F）</el-radio>
                         </el-radio-group>
+                    </el-col>
+                    <el-col :offset="10" :span="2">
+                        <el-button type="primary" @click="daochuData()">导出</el-button>
                     </el-col>
                 </el-row>
             </el-row>
@@ -107,7 +110,7 @@
 </template>
 
 <script>
-    import { inquireBuyBack } from '../../api/index'
+    import { inquireBuyBack, exportInquireBuyBack, payForexportInquireBuyBack } from '../../api/index'
     import echarts from 'echarts'
     export default {
         data() {
@@ -170,21 +173,30 @@
             const end = new Date();
             const start = new Date();
             start.setTime(start.getTime() - 3600 * 1000 * 24 * 200);
-            this.params.startTime = this.$moment(start).format('YYYY/M/D HH:mm')
-            this.params.endTime = this.$moment(end).format('YYYY/M/D HH:mm')
+            this.params.startTime = this.$moment(start).format('YYYY-MM-DD HH:mm')
+            this.params.endTime = this.$moment(end).format('YYYY-MM-DD HH:mm')
             this.dateTime= [this.params.startTime, this.params.endTime]
         },
         methods: {
             getDate(getDate){
-                this.params.startTime = this.$moment(getDate[0]).format('YYYY/M/D HH:mm')
-                this.params.endTime = this.$moment(getDate[1]).format('YYYY/M/D HH:mm')
+                this.params.startTime = this.$moment(getDate[0]).format('YYYY-MM-DD HH:mm')
+                this.params.endTime = this.$moment(getDate[1]).format('YYYY-MM-DD HH:mm')
             },
             getTableData(){
                 this.loading = true
                 inquireBuyBack(this.params).then(res=>{
-                    this.tableData = res
-                    this.loading = false
-                    console.log(res)
+                    if(res.code == 200){
+                        
+                        this.tableData = res.data.inquire_data
+                        this.loading = false
+                        console.log(res)
+                    } else{
+                        this.$message({
+                            message: res.msg,
+                            type: 'error'
+                        });
+                    }
+                   
                 })
             },
             changeType(type){
@@ -202,6 +214,22 @@
                 this.loading = true
                 this.params.time = 10
                 this.getTableData()
+            },
+            daochuData(){
+                //  mobile=15811239813&target=1&time=30&userType=1&payStartTime=2019-01-01%2000:00:00&payEndTime=2019-10-10%2000:00:00
+                payForexportInquireBuyBack(this.params).then(res=>{
+                    console.log(res)
+                    let routerData = this.$router.resolve({path:'/pay',query:{htmls:res}})
+                 	this.htmls = res
+                 	//打开新页面
+                 	window.location.href = routerData.href
+                })
+                // exportInquireBuyBack(this.params).then((res)=>{
+                //     console.log(res)
+                // })
+
+
+                // window.location.href='http://47.104.162.109/api/exportInquireBuyBack?mobile='+this.params.mobile+'&startTime='+this.params.startTime+'&endTime='+this.params.endTime+'&userType='+this.params.userType+'&time='+this.params.time+'&target='+this.params.target
             }
         },
         mounted() {

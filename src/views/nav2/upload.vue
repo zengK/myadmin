@@ -74,7 +74,7 @@ export default {
 				})
 				this.fileList = []
 
-				this.$router.push({path:'/table'})
+				this.$router.push({path:'/sku'})
 			} else {
 				this.$message({
 					type:"error",

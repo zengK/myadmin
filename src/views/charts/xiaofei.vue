@@ -8,7 +8,7 @@
                         v-model="dateTime"
                         type="datetimerange"
                         :picker-options="pickerOptions"
-                        format="yyyy/M/d HH:mm"
+                        format="yyyy-MM-DD HH:mm"
                         @change="getDate(dateTime)"
                         range-separator="至"
                         start-placeholder="开始日期"
@@ -153,8 +153,8 @@
             const end = new Date();
             const start = new Date();
             start.setTime(start.getTime() - 3600 * 1000 * 24 * 200);
-            this.params.startTime = this.$moment(start).format('YYYY/M/D HH:mm')
-            this.params.endTime = this.$moment(end).format('YYYY/M/D HH:mm')
+            this.params.startTime = this.$moment(start).format('YYYY-MM-DD HH:mm')
+            this.params.endTime = this.$moment(end).format('YYYY-MM-DD HH:mm')
             this.dateTime= [this.params.startTime, this.params.endTime]
         },
         methods: {
@@ -179,6 +179,9 @@
                         }
                         console.log(res)
                         this.drawBarChart()
+                    } else{
+                        this.loading = false
+                        this.$message.error(res.msg)
                     }
                 })
             },
@@ -187,8 +190,8 @@
                 this.getDataList()
             },
             getDate(getDate){
-                this.params.startTime = this.$moment(getDate[0]).format('YYYY/M/D HH:mm')
-                this.params.endTime = this.$moment(getDate[1]).format('YYYY/M/D HH:mm')
+                this.params.startTime = this.$moment(getDate[0]).format('YYYY-MM-DD HH:mm')
+                this.params.endTime = this.$moment(getDate[1]).format('YYYY-MM-DD HH:mm')
             },
             changeType(radio){
                 if(this.radio == 1){

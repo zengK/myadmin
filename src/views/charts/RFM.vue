@@ -145,7 +145,7 @@
                 this.getRFMdata()
             },
             getDate(getDate){
-                this.params.queryTime = this.$moment(getDate).format('YYYY/M/D')
+                this.params.queryTime = this.$moment(getDate).format('yyyy-MM-DD')
             },
             getRFMdata(){
                 inquireRfm(this.params).then((res)=>{

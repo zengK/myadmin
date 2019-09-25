@@ -1,7 +1,7 @@
 <template>
 <el-row class="center">
 	<el-row class="changeType">
-		<el-button type="primary" @click="dialogVisible = true">重新选择</el-button>
+		<el-button type="primary" v-show="!ispay" @click="dialogVisible = true">重新选择</el-button>
 	</el-row>
 	<el-col :span="12" v-show="type==1">
 		<h2>免费</h2>
@@ -64,14 +64,15 @@
 </template>
 
 <script>
-	import { bind, bindstoreid, alipay } from '../../api/index' 
+	import { bind, bindstoreid, alipay, apiReturn } from '../../api/index' 
 	export default {
 		data() {
 			return {
 				loading: false,
 				dialogVisible: true,
 				exitFileList: [],
-				ispayShop:'',
+				ispay:'',
+				total_amount:'',
 				type:1,
 				mobile:'',
 				form2:{
@@ -85,6 +86,20 @@
 					list:[
 						{storeid: ''}
 					]
+				},
+				payParams:{
+					charset:'',
+					out_trade_no:'',
+					method:'',
+					total_amount:'',
+					sign:'',
+					trade_no:'',
+					auth_app_id:'',
+					version:'',
+					app_id:'',
+					sign_type:'',
+					seller_id:'',
+					timestamp:''
 				}
 			}
 		},
@@ -92,8 +107,50 @@
 			let userInfo = JSON.parse(sessionStorage.getItem('userinfo'))
 			this.mobile = userInfo.mobile
 			console.log(this.mobile)
+			this.payParams.charset = this.$route.query.charset
+			this.payParams.out_trade_no = this.$route.query.out_trade_no
+			this.payParams.method = this.$route.query.method
+			this.payParams.sign = this.$route.query.sign
+			this.payParams.trade_no = this.$route.query.trade_no
+			this.payParams.total_amount = this.$route.query.total_amount
+			this.payParams.auth_app_id = this.$route.query.auth_app_id
+			this.payParams.version = this.$route.query.version
+			this.payParams.app_id = this.$route.query.app_id,
+			this.payParams.sign_type = this.$route.query.sign_type,
+			this.payParams.seller_id = this.$route.query.seller_id,
+			this.payParams.timestamp = this.$route.query.timestamp
+		},
+		mounted() {
+			if(this.total_amount!=undefined){
+				this.type = 2
+				this.ispayMoney()
+			}
 		},
 		methods: {
+			ispayMoney(){
+				// 
+				//{
+				//       "code": 200,
+				//       "msg": "支付成功",
+				//       "data":
+				//       {
+				//              "phone": "15701285821",
+				//              "id": 3,
+				//              "ispayShop": "1"
+				//       }
+				// }
+				apiReturn(this.payParams).then((res)=>{
+					console.log(res)
+					if(res.code==200){
+						this.$message({
+							type:'success',
+							message:res.msg
+						})
+						this.ispay = true
+						this.dialogVisible = false
+					}
+				})
+			},
 			addshopId(){
 				if(this.form.list.length == 10){
 					this.$message.error('最多添加10个店铺ID');
@@ -156,12 +213,12 @@
 			//选择付费类型
 			changetype(type){
 				if(type == 2){
-					alipay().then((res)=>{
+					alipay({mobile:this.mobile}).then((res)=>{
 						console.log(res)
 						let routerData = this.$router.resolve({path:'/pay',query:{htmls:res}})
 	                 	this.htmls = res
 	                 	//打开新页面
-	                 	window.open(routerData.href)
+	                 	window.location.href = routerData.href
 					})
 				} else{
 					bind({mobile:this.mobile,bind:type}).then((res)=>{
@@ -170,7 +227,7 @@
 								type:'success',
 								message: res.msg
 							})
-							this.ispayShop = false
+							this.ispay = false
 							this.dialogVisible = false
 						}
 					})
